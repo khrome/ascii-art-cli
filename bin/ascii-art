@@ -1,0 +1,187 @@
+#!/usr/bin/env node
+var argv;
+var actor = require('../index.js')
+var pkg = require('../package')
+var pkg = require('../package');
+var artpkg = require('ascii-art/package')
+var yargs = require('yargs');
+var fs = require('fs');
+var art = require('ascii-art');
+
+var conf = require('rc')('ascii-art', {
+  //defaults go here.
+  bitdepth: 2468,
+  requestlib: '', //request-as-request, fetch-as-request, axios-as-request
+  artwork: []
+});
+
+var { defineCommand, defineArgument } = actor.getDefinitionFns(yargs);
+art.font('ascii-art', 'Doom', function(err, value){
+art.font('Abbey Hawk Sparrow', 'u:script', function(err, sig){
+    yargs.usage(
+        actor.style(value, 'yellow').slice(0,-5)+'\033[39m  v'+artpkg.version+"\n"+
+        '                                              tools v'+pkg.version+"\n"+
+        'Usage: $0 <command> [options] <target>'
+    ).demand(2);
+
+    defineCommand(
+        'image',
+        'convert an image to ascii', [[
+            '$0 image foo.jpg ',
+            'output foo.jpg as inline ascii text with ansi colors'
+        ]]
+    );
+        defineArgument(
+            'color-distance', 'string',
+            'algorithm (or combination of algorithms) to use when computing the distance between colors', 1,
+            [
+                'euclideanDistance',
+                'classic',
+                'ratioDistance',
+                'classicByValue',
+                'CIE76Difference',
+                'closestByIntensity',
+                'rankedChannel',
+                'simple',
+                'original'
+            ]
+        );
+        defineArgument(
+            'alphabet', 'string',
+            'the alphabet to use rendering the image', 1,
+            [
+                'variant1',
+                'variant2',
+                'variant3',
+                'variant4',
+                'ultra-wide',
+                'wide',
+                'hatching',
+                'bits',
+                'binary',
+                'greyscale',
+                'blocks',
+                'solid'
+            ]
+        );
+        defineArgument(
+            'bit-depth', 'string',
+            'bit-depth to use for color', 1,
+            [4, 8, 32]
+        );
+        defineArgument(
+            'posterize', 'boolean',
+            'bit-depth to use for color', 0
+        );
+        defineArgument(
+            'blended', 'boolean',
+            'merge render modes', 0
+        );
+        defineArgument(
+            'lineart', 'boolean',
+            'draw subpixel lines using block characters', 0
+        );
+        defineArgument(
+            'stipple', 'string',
+            'draw subpixel lines using braille characters using the provided color', 1
+        );
+    defineCommand(
+        'text',
+        'add styles and/or font rendering to text', [
+            [
+                '$0 text -F Doom "Some Titles"',
+                'outputs "Some Titles" in the Doom font'
+            ],[
+                '$0 text -s red+underline "Some Titles"',
+                'outputs "Some Titles" with a red and underlined terminal style'
+            ],[
+                '$0 text -F Doom "Some Titles"',
+                'outputs "Some Titles" in the Doom font'
+            ]
+        ]
+    );
+        defineArgument(
+            'font', 'string',
+            'the flf font to render the text in', 1
+        );
+        defineArgument(
+            'style', 'string',
+            'the styles to render the text in', 1
+        );
+        defineArgument(
+            'global', 'string',
+            'install the font globally', 1
+        );
+    defineCommand(
+        'art',
+        'get some ascii art from various sites', [
+            [
+                '$0 art textfiles.com ',
+                'list available groupings from "textfiles.com"'
+            ],[
+                '$0 art textfiles.com/RAZOR ',
+                'list files in the group "RAZOR" on "textfiles.com"'
+            ],[
+                '$0 art textfiles.com/art/dragon.txt ',
+                'request the file "dragon.txt" (in the group "art") remotely from "textfiles.com"'
+            ]
+        ]
+    );
+    defineCommand(
+        'install',
+        'install an .flf from figlet.org', [
+            [
+                '$0 install Font.flf ',
+                'install a figlet font'
+            ],[
+                '$0 install weird',
+                'install weird.flf into the local "/Fonts" directory'
+            ],[
+                '$0 install weird -g',
+                'install weird.flf into the currently executing ascii-art instance'
+            ]
+        ]
+    );
+
+    yargs.help('h').alias('h', 'help')
+        .epilog('[ ©2014 - 2021 : '+actor.style(sig, 'red')+' ]');
+
+    //let's pipe!
+    if(!process.stdin.isTTY){
+        var BUFSIZE = 65536;
+        let nbytes = 0;
+        let chunks = [];
+        let buffer = '';
+
+        while(true) {
+          try {
+            buffer = Buffer.alloc(BUFSIZE);
+            nbytes = fs.readSync(0, buffer, 0, BUFSIZE, null);
+          }
+          catch (e) {
+            if (e.code != 'EAGAIN') throw e;
+          };
+
+          if (nbytes === 0) break;
+           chunks.push(buffer.slice(0, nbytes));
+        };
+
+        const stdin = Buffer.concat(chunks).toString();
+        if(stdin){
+          process.clPipe = stdin.trim();
+        }
+    }
+
+    argv = yargs.argv;
+    var action = argv._.shift();
+    var target = argv._.shift();
+    var validator = /^[A-Za-z0-9\-\_]+$/;
+    if(action && !validator.test(action)) throw new Error('invalid action');
+    if(argv.v && target && !(new RegExp(argv.v)).test(target)) throw new Error('invalid target');
+    if(target) argv.target = target;
+    console.log(action, argv, conf, process.clPipe)
+    if(action) actor.performAction(action, argv, function(){
+        console.log('DONE');
+    });
+});
+});
