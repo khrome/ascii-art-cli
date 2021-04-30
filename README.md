@@ -14,6 +14,31 @@ This is a commandline module, which does not interact with a local directory, so
 Setup
 -----
 
+<details><summary> OS X </summary>
+<p>
+```bash
+    ascii-art-autoconfig
+    ascii-art --help
+```
+</p>
+</details>
+<details><summary> Linux </summary>
+<p>
+```bash
+    ascii-art-autoconfig
+    ascii-art --help
+```
+</p>
+</details>
+<details><summary> Windows </summary>
+<p>
+```bash
+    #sorry, no autoconfig for now
+    ascii-art --help
+```
+</p>
+</details>
+
 Once installed, you can generate a configuration by running (though it will run without one)
 
     `ascii-art-autoconfig`
