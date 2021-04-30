@@ -16,6 +16,7 @@ Setup
 
 <details><summary> OS X </summary>
 <p>
+
 ```bash
     ascii-art-autoconfig
     ascii-art --help
@@ -24,6 +25,7 @@ Setup
 </details>
 <details><summary> Linux </summary>
 <p>
+
 ```bash
     ascii-art-autoconfig
     ascii-art --help
@@ -32,6 +34,7 @@ Setup
 </details>
 <details><summary> Windows </summary>
 <p>
+
 ```bash
     #sorry, no autoconfig for now
     ascii-art --help
