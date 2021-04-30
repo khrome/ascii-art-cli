@@ -13,7 +13,8 @@ This is a commandline module, which does not interact with a local directory, so
 
 Setup
 -----
-
+<table>
+<tr><td>
 <details><summary> OS X </summary>
 <p>
 
@@ -22,7 +23,7 @@ Setup
     ascii-art --help
 ```
 </p>
-</details>
+</details></td><td>
 <details><summary> Linux </summary>
 <p>
 
@@ -31,7 +32,7 @@ Setup
     ascii-art --help
 ```
 </p>
-</details>
+</details></td><td>
 <details><summary> Windows </summary>
 <p>
 
@@ -41,6 +42,8 @@ Setup
 ```
 </p>
 </details>
+</td></tr></table>
+
 
 Once installed, you can generate a configuration by running (though it will run without one)
 
