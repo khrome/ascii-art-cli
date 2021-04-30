@@ -9,7 +9,15 @@ var actions = {
 };
 var Ansi = require('ascii-art-ansi');
 
+var styles = {
+    actionColor : 'blue',
+    stringColor : 'yellow',
+    flagColor : 'cyan',
+    sigColor : 'magenta'
+}
+
 module.exports = {
+    styles: styles,
     style: function(str, style){
         return Ansi.codes(str, style, true)
     },
@@ -50,15 +58,15 @@ module.exports = {
         }
 
         var defineCommand = function(name, description, examples){
-            var coloredName = module.exports.style(name, 'blue');
+            var coloredName = module.exports.style(name, styles.actionColor);
             var rgx = new RegExp(' '+name+' ', 'g');
             var styleThings = function(str){
                 return str
                     .replace( rgx, ' '+coloredName+' ' )
                     .replace( /(".*?")/g, function(i, match){
-                        return module.exports.style(match, 'yellow');
+                        return module.exports.style(match, styles.stringColor);
                     }).replace( /(-.(?: |$))/g, function(i, match){
-                        return module.exports.style(match, 'cyan');
+                        return module.exports.style(match, styles.flagColor);
                     })
             };
             yargs.command(coloredName, description);

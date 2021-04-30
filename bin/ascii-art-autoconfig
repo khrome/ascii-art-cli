@@ -1,0 +1,14 @@
+#!/bin/sh
+
+oldstty=$(stty -g)
+Ps=${1:-11}
+stty raw -echo min 0 time 0
+printf "\033]$Ps;?\033\\"
+sleep 0.00000001
+read -r answer
+result=${answer#*;}
+stty $oldstty
+color=`echo "${result}" | sed 's/[^rgb:0-9a-f/]\+$//'`
+hex="#${color:4:2}${color:9:2}${color:14:2}"
+#echo "${hex}"
+node "${BASH_SOURCE%/*}/ascii-art-config" mode "${hex}"

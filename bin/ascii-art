@@ -10,7 +10,7 @@ var art = require('ascii-art');
 
 var conf = require('rc')('ascii-art', {
   //defaults go here.
-  bitdepth: 2468,
+  bitdepth: 2,
   requestlib: '', //request-as-request, fetch-as-request, axios-as-request
   artwork: []
 });
@@ -144,7 +144,7 @@ art.font('Abbey Hawk Sparrow', 'u:script', function(err, sig){
     );
 
     yargs.help('h').alias('h', 'help')
-        .epilog('[ ©2014 - 2021 : '+actor.style(sig, 'red')+' ]');
+        .epilog('[ ©2014 - 2021 : '+actor.style(sig, actor.styles.sigColor)+' ]');
 
     //let's pipe!
     if(!process.stdin.isTTY){
