@@ -18,19 +18,31 @@ Setup
 <details><summary> OS X </summary>
 <p>
 
-```bash
-    ascii-art-autoconfig
-    ascii-art --help
-```
-</p>
-</details></td><td>
-<details><summary> Linux </summary>
-<p>
+Once installed, you can generate a configuration by running (though it will run without one)
 
 ```bash
     ascii-art-autoconfig
     ascii-art --help
 ```
+
+which will (among other things) detect your theme and set an appropriate config.
+Edits can be made by hand in `~/.ascii-artrc` or by using `ascii-art-config <key> <value>`
+
+</p>
+</details></td><td>
+<details><summary> Linux </summary>
+<p>
+
+Once installed, you can generate a configuration by running (though it will run without one)
+
+```bash
+    ascii-art-autoconfig
+    ascii-art --help
+```
+
+which will (among other things) detect your theme and set an appropriate config.
+Edits can be made by hand in `~/.ascii-artrc` or by using `ascii-art-config <key> <value>`
+
 </p>
 </details></td><td>
 <details><summary> Windows </summary>
@@ -44,13 +56,6 @@ Setup
 </details>
 </td></tr></table>
 
-
-Once installed, you can generate a configuration by running (though it will run without one)
-
-    `ascii-art-autoconfig`
-
-which will (among other things) detect your theme and set an appropriate config.
-Edits can be made by hand in `~/.ascii-artrc` or by using `ascii-art-config <key> <value>`
 
 Help
 ----
