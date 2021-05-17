@@ -61,7 +61,7 @@ Help
 ----
 Interactive instructions can be found using `ascii-art --help`
 
-<img src="https://github.com/khrome/ascii-art-docs/raw/master/Examples/ascii-art-h.jpg" >
+<img src="https://github.com/khrome/ascii-art-docs/raw/master/Examples/ascii-art-h.png" >
 
 Documentation
 -------------

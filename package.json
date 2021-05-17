@@ -1,6 +1,6 @@
 {
   "name": "ascii-art-cl",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "dependencies": {
     "ascii-art": "^2.8.0",
     "ascii-art-ansi": "^1.4.0",
