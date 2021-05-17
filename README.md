@@ -1,7 +1,7 @@
 ascii-art-cl
 ============
 
-A command line utility for [ascii-art](https://www.npmjs.com/package/ascii-art), now upgraded from the
+A command line utility for [ascii-art](https://www.npmjs.com/package/ascii-art), now upgraded from the previous CLI, and no longer polluting the main module with it's deps
 
 
 Install
@@ -60,6 +60,8 @@ Edits can be made by hand in `~/.ascii-artrc` or by using `ascii-art-config <key
 Help
 ----
 Interactive instructions can be found using `ascii-art --help`
+
+<img src="https://github.com/khrome/ascii-art-docs/raw/master/Examples/ascii-art-h.jpg" >
 
 Documentation
 -------------

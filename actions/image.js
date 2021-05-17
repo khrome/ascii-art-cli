@@ -3,33 +3,27 @@ var Color = require('ascii-art-ansi/color');
 module.exports = function(opts, cb){
     var options = {
         filepath: opts.target,
-        lineart: opts.L,
-        stippled: opts.S,
-        blended: opts.E,
-        threshold: opts.H,
-        darken: opts.D,
-        posterize: opts.P,
+        lineart: opts.l,
+        stippled: opts.s,
+        blended: opts.b,
+        threshold: opts.t,
+        floor: opts.f,
+        //darken: opts.D,
+        posterize: opts.p,
     };
     if(opts.a) options.alphabet = opts.a;
     if(opts.B){
         switch(opts.B+''){
             case '4':
-                Color.is256 = false;
-                Color.isTrueColor = false;
-                break;
             case '8':
-                Color.is256 = true;
-                Color.isTrueColor = false;
-                break;
             case '32':
-                Color.is256 = false;
-                Color.isTrueColor = true;
+                Color.depth(parseInt(opts.B));
                 break;
             default: throw new Error('Unsupported Bit Depth: '+opts.B)
         }
     }
-    if(opts.C){
-        Color.useDistance(opts.C);
+    if(opts.c){
+        Color.useDistance(opts.c);
     }
     if(
         process &&
@@ -39,16 +33,16 @@ module.exports = function(opts, cb){
         options.width = process.stdout.columns;
     }
     var image = new art.Image(options);
-    if(options.lineart){
-        image.writeLineArt(function(err, text){
+    if(options.posterize){
+        if(!image.options.stroke) image.options.stroke = 'black';
+        image.writePosterized(function(err, text){
+            if(err) console.log(err);
             if(opts.o) fs.writeFile(opts.o, text);
             else console.log(text+"\033[39;49m");
         });
     }else{
-        if(options.posterize){
-            if(!image.options.stroke) image.options.stroke = 'black';
-            image.writePosterized(function(err, text){
-                if(err) console.log(err);
+        if(options.lineart){
+            image.writeLineArt(function(err, text){
                 if(opts.o) fs.writeFile(opts.o, text);
                 else console.log(text+"\033[39;49m");
             });

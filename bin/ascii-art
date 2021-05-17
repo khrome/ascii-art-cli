@@ -2,7 +2,7 @@
 var argv;
 var actor = require('../index.js')
 var pkg = require('../package')
-var pkg = require('../package');
+//var pkg = require('../package');
 var artpkg = require('ascii-art/package')
 var yargs = require('yargs');
 var fs = require('fs');
@@ -11,9 +11,20 @@ var art = require('ascii-art');
 var conf = require('rc')('ascii-art', {
   //defaults go here.
   bitdepth: 2,
-  requestlib: '', //request-as-request, fetch-as-request, axios-as-request
-  artwork: []
+  requestlib: 'request-as-request', //request-as-request, fetch-as-request, axios-as-request
+  artwork: ['textfilesdotcom']
 });
+
+art.use('artwork', require('ascii-art/artwork'));
+art.use('request', require(conf.requestlib));
+
+var sourceList = [];
+conf.artwork.forEach(function(source){
+    sourceList.push(source);
+    art.Artwork.addSource(require('ascii-art-source-'+source));
+});
+
+
 
 var { defineCommand, defineArgument } = actor.getDefinitionFns(yargs);
 art.font('ascii-art', 'Doom', function(err, value){
@@ -21,7 +32,8 @@ art.font('Abbey Hawk Sparrow', 'u:script', function(err, sig){
     yargs.usage(
         actor.style(value, 'yellow').slice(0,-5)+'\033[39m  v'+artpkg.version+"\n"+
         '                                              tools v'+pkg.version+"\n"+
-        'Usage: $0 <command> [options] <target>'
+        'Plugins:'+"\n"+'    '+(sourceList.length?sourceList.join(', '):'N/A')+"\n\n"+
+        'Usage:'+"\n"+'    $0 <command> [options] <target>'
     ).demand(2);
 
     defineCommand(
@@ -43,6 +55,10 @@ art.font('Abbey Hawk Sparrow', 'u:script', function(err, sig){
                 'closestByIntensity',
                 'rankedChannel',
                 'simple',
+                'minDeviation',
+                'luminosity',
+                'saturation',
+                'hue',
                 'original'
             ]
         );
@@ -67,19 +83,27 @@ art.font('Abbey Hawk Sparrow', 'u:script', function(err, sig){
         defineArgument(
             'bit-depth', 'string',
             'bit-depth to use for color', 1,
-            [4, 8, 32]
+            [4, 8, 32], 'B'
+        );
+        defineArgument(
+            'threshold', 'number',
+            'the threshold for drawing edges', 1
+        );
+        defineArgument(
+            'floor', 'number',
+            'the floor of the threshold for drawing edges', 1
         );
         defineArgument(
             'posterize', 'boolean',
-            'bit-depth to use for color', 0
+            'use thresholding to find edges and paint this on top of a background color map', 0
         );
         defineArgument(
             'blended', 'boolean',
             'merge render modes', 0
         );
         defineArgument(
-            'lineart', 'boolean',
-            'draw subpixel lines using block characters', 0
+            'lineart', 'string',
+            'draw subpixel lines using block characters using the provided color', 1
         );
         defineArgument(
             'stipple', 'string',
@@ -102,7 +126,8 @@ art.font('Abbey Hawk Sparrow', 'u:script', function(err, sig){
     );
         defineArgument(
             'font', 'string',
-            'the flf font to render the text in', 1
+            'the flf font to render the text in', 1,
+            null, 'F'
         );
         defineArgument(
             'style', 'string',
@@ -179,7 +204,7 @@ art.font('Abbey Hawk Sparrow', 'u:script', function(err, sig){
     if(action && !validator.test(action)) throw new Error('invalid action');
     if(argv.v && target && !(new RegExp(argv.v)).test(target)) throw new Error('invalid target');
     if(target) argv.target = target;
-    console.log(action, argv, conf, process.clPipe)
+    //console.log(action, argv, conf, process.clPipe)
     if(action) actor.performAction(action, argv, function(){
         console.log('DONE');
     });
