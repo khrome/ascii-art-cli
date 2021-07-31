@@ -1,6 +1,6 @@
 {
   "name": "ascii-art-cl",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
     "app-term-kit": "^0.3.0",
     "ascii-art": "^2.8.5",
@@ -14,7 +14,7 @@
   "bin": {
     "ascii-art": "./bin/ascii-art",
     "ascii-art-config": "./bin/ascii-art-config",
-    "ascii-art-autoconfig": "./bin/autoconfig.sh"
+    "ascii-art-autoconfig": "./bin/ascii-art-autoconfig"
   },
   "devDependencies": {
     "ascii-art-docs": "0.0.1",
