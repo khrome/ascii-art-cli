@@ -1,8 +1,10 @@
 {
   "name": "ascii-art-cl",
   "version": "0.1.1",
+  "author": "Abbey Hawk Sparrow <@khrome> (http://patternweaver.com)",
+  "description": "command line application for creating, modifying and finding Ascii Art",
   "dependencies": {
-    "app-term-kit": "^0.3.0",
+    "app-term-kit": "^0.3.1",
     "ascii-art": "^2.8.5",
     "ascii-art-ansi": "^1.4.1",
     "comment-json": "^4.1.0",
