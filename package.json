@@ -1,13 +1,15 @@
 {
   "name": "ascii-art-cl",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "dependencies": {
-    "ascii-art": "^2.8.0",
-    "ascii-art-ansi": "^1.4.0",
+    "app-term-kit": "^0.3.0",
+    "ascii-art": "^2.8.5",
+    "ascii-art-ansi": "^1.4.1",
     "comment-json": "^4.1.0",
     "is-installed-globally": "^0.4.0",
     "jsftp": "2.1.3",
-    "parse-color": "^1.0.0"
+    "parse-color": "^1.0.0",
+    "uuid": "^8.3.2"
   },
   "bin": {
     "ascii-art": "./bin/ascii-art",
@@ -16,7 +18,6 @@
   },
   "devDependencies": {
     "ascii-art-docs": "0.0.1",
-    "ascii-art-source-textfilesdotcom": "0.0.1",
     "chai": "^4.3.4",
     "mocha": "^8.3.2",
     "request": "^2.88.2",

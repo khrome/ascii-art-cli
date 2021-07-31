@@ -66,3 +66,28 @@ Interactive instructions can be found using `ascii-art --help`
 Documentation
 -------------
 Extended documentation can be found at [the ascii-art repo](https://github.com/khrome/ascii-art).
+
+Artwork
+-------
+Support for artwork is back(note that there is currently no charset conversion)!
+
+To install the plugin for `textfiles.com`:
+
+```bash
+ascii-art install artwork textfilesdotcom
+```
+(to then remove `~/.ascii-art/config` and remove `textfilesdotcom` from the `.artwork` list)
+
+now any searches will use this plugin and fetches can be executed against it.
+
+Ex: Search for all instances of `bbs` in the descriptions text.
+
+```bash
+ascii-art art search bbs
+```
+
+Ex: get `foo.nfo` from the `BLAH` grouping using the `textfilesdotcom` plugin:
+
+```bash
+ascii-art art fetch textfiles.com:BLAH:foo.nfo
+```

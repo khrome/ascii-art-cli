@@ -22,7 +22,7 @@ module.exports = function(options, cb){
                 fs.writeFile(dir+options.target.toLowerCase()+'.flf', str, function(err){
                     ftp.raw("quit", function(err, data) {
                         if (err) return console.error(err);
-                        console.log(target+' written');
+                        console.log(options.target+' written');
                         cb();
                     });
                 });
@@ -31,15 +31,20 @@ module.exports = function(options, cb){
         });
         sock.resume();
     }
-    ftp.get(makeURLForDirectory('contributed'), function(err, socket){
-        //console.log('ERR', err);
-        if (err) return ftp.get(makeURLForDirectory('international'), function(err2, socket){
-            if (err2) return ftp.get(makeURLForDirectory('ours'), function(err3, socket){
-                if(err3) return;
-                handle(socket)
+    switch(options.subaction){
+        case 'install':
+            ftp.get(makeURLForDirectory('contributed'), function(err, socket){
+                //console.log('ERR', err);
+                if (err) return ftp.get(makeURLForDirectory('international'), function(err2, socket){
+                    if (err2) return ftp.get(makeURLForDirectory('ours'), function(err3, socket){
+                        if(err3) return;
+                        handle(socket)
+                    });
+                    handle(socket)
+                });
+                handle(socket);
             });
-            handle(socket)
-        });
-        handle(socket);
-    });
+            break;
+        default: throw new Error('Unknow subaction:'+options.subaction)
+    }
 }

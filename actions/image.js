@@ -3,27 +3,27 @@ var Color = require('ascii-art-ansi/color');
 module.exports = function(opts, cb){
     var options = {
         filepath: opts.target,
-        lineart: opts.l,
-        stippled: opts.s,
-        blended: opts.b,
-        threshold: opts.t,
-        floor: opts.f,
+        lineart: opts.lineart,
+        stippled: opts.stipple,
+        blended: opts.blended,
+        threshold: opts.threshold,
+        floor: opts.floor,
         //darken: opts.D,
-        posterize: opts.p,
+        posterize: opts.posterize,
     };
-    if(opts.a) options.alphabet = opts.a;
-    if(opts.B){
-        switch(opts.B+''){
+    if(opts.alphabet) options.alphabet = opts.alphabet;
+    if(opts['bit-depth']){
+        switch(opts['bit-depth']+''){
             case '4':
             case '8':
             case '32':
-                Color.depth(parseInt(opts.B));
+                Color.depth(parseInt(opts['bit-depth']));
                 break;
             default: throw new Error('Unsupported Bit Depth: '+opts.B)
         }
     }
-    if(opts.c){
-        Color.useDistance(opts.c);
+    if(opts['color-distance']){
+        Color.useDistance(opts['color-distance']);
     }
     if(
         process &&

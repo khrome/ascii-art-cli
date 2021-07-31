@@ -1,212 +1,296 @@
 #!/usr/bin/env node
 var argv;
-var actor = require('../index.js')
-var pkg = require('../package')
-//var pkg = require('../package');
-var artpkg = require('ascii-art/package')
-var yargs = require('yargs');
-var fs = require('fs');
+var actor = require('../index.js');
+var pkg = require('../package');
+var artpkg = require('ascii-art/package');
 var art = require('ascii-art');
+var path = require('path');
+var CLApp = require('app-term-kit');
+var createRequireFromPath = require('module').createRequireFromPath;
 
-var conf = require('rc')('ascii-art', {
-  //defaults go here.
-  bitdepth: 2,
-  requestlib: 'request-as-request', //request-as-request, fetch-as-request, axios-as-request
-  artwork: ['textfilesdotcom']
+var app = new CLApp('ascii-art', {
+    copyright : 'Abbey Hawk Sparrow',
+    trademark : 'Abbey Hawk Sparrow',
+    copystart : '2019',
+    //fslink : ':modules:/local-plugins',
+    defaults : `{
+    // defaults go here.
+    "bitdepth": 2,
+    //request-as-request, fetch-as-request, axios-as-request
+    "requestlib": "request-as-request",
+    "artwork": []
+}`
 });
 
-art.use('artwork', require('ascii-art/artwork'));
-art.use('request', require(conf.requestlib));
-
-var sourceList = [];
-conf.artwork.forEach(function(source){
-    sourceList.push(source);
-    art.Artwork.addSource(require('ascii-art-source-'+source));
+//this assumes all plugins are artwork
+app.on('plugins-installed', function(pluginList){
+    app.config(function(err, config, save){
+        pluginList.forEach(function(pluginName){
+            if(pluginName.indexOf('ascii-art-source-' !== -1)){
+                // ascii-art-source-blah -> blah
+                config.artwork.push(pluginName.substring(17))
+            }
+        });
+        save(config, function(){
+            console.log('enabled plugins', config.artwork);
+        });
+    }, true);
 });
 
+var dirs = {};
 
-
-var { defineCommand, defineArgument } = actor.getDefinitionFns(yargs);
-art.font('ascii-art', 'Doom', function(err, value){
-art.font('Abbey Hawk Sparrow', 'u:script', function(err, sig){
-    yargs.usage(
-        actor.style(value, 'yellow').slice(0,-5)+'\033[39m  v'+artpkg.version+"\n"+
-        '                                              tools v'+pkg.version+"\n"+
-        'Plugins:'+"\n"+'    '+(sourceList.length?sourceList.join(', '):'N/A')+"\n\n"+
-        'Usage:'+"\n"+'    $0 <command> [options] <target>'
-    ).demand(2);
-
-    defineCommand(
-        'image',
-        'convert an image to ascii', [[
-            '$0 image foo.jpg ',
-            'output foo.jpg as inline ascii text with ansi colors'
-        ]]
-    );
-        defineArgument(
-            'color-distance', 'string',
-            'algorithm (or combination of algorithms) to use when computing the distance between colors', 1,
-            [
-                'euclideanDistance',
-                'classic',
-                'ratioDistance',
-                'classicByValue',
-                'CIE76Difference',
-                'closestByIntensity',
-                'rankedChannel',
-                'simple',
-                'minDeviation',
-                'luminosity',
-                'saturation',
-                'hue',
-                'original'
-            ]
-        );
-        defineArgument(
-            'alphabet', 'string',
-            'the alphabet to use rendering the image', 1,
-            [
-                'variant1',
-                'variant2',
-                'variant3',
-                'variant4',
-                'ultra-wide',
-                'wide',
-                'hatching',
-                'bits',
-                'binary',
-                'greyscale',
-                'blocks',
-                'solid'
-            ]
-        );
-        defineArgument(
-            'bit-depth', 'string',
-            'bit-depth to use for color', 1,
-            [4, 8, 32], 'B'
-        );
-        defineArgument(
-            'threshold', 'number',
-            'the threshold for drawing edges', 1
-        );
-        defineArgument(
-            'floor', 'number',
-            'the floor of the threshold for drawing edges', 1
-        );
-        defineArgument(
-            'posterize', 'boolean',
-            'use thresholding to find edges and paint this on top of a background color map', 0
-        );
-        defineArgument(
-            'blended', 'boolean',
-            'merge render modes', 0
-        );
-        defineArgument(
-            'lineart', 'string',
-            'draw subpixel lines using block characters using the provided color', 1
-        );
-        defineArgument(
-            'stipple', 'string',
-            'draw subpixel lines using braille characters using the provided color', 1
-        );
-    defineCommand(
-        'text',
-        'add styles and/or font rendering to text', [
-            [
-                '$0 text -F Doom "Some Titles"',
-                'outputs "Some Titles" in the Doom font'
-            ],[
-                '$0 text -s red+underline "Some Titles"',
-                'outputs "Some Titles" with a red and underlined terminal style'
-            ],[
-                '$0 text -F Doom "Some Titles"',
-                'outputs "Some Titles" in the Doom font'
-            ]
-        ]
-    );
-        defineArgument(
-            'font', 'string',
-            'the flf font to render the text in', 1,
-            null, 'F'
-        );
-        defineArgument(
-            'style', 'string',
-            'the styles to render the text in', 1
-        );
-        defineArgument(
-            'global', 'string',
-            'install the font globally', 1
-        );
-    defineCommand(
-        'art',
-        'get some ascii art from various sites', [
-            [
-                '$0 art textfiles.com ',
-                'list available groupings from "textfiles.com"'
-            ],[
-                '$0 art textfiles.com/RAZOR ',
-                'list files in the group "RAZOR" on "textfiles.com"'
-            ],[
-                '$0 art textfiles.com/art/dragon.txt ',
-                'request the file "dragon.txt" (in the group "art") remotely from "textfiles.com"'
-            ]
-        ]
-    );
-    defineCommand(
-        'install',
-        'install an .flf from figlet.org', [
-            [
-                '$0 install Font.flf ',
-                'install a figlet font'
-            ],[
-                '$0 install weird',
-                'install weird.flf into the local "/Fonts" directory'
-            ],[
-                '$0 install weird -g',
-                'install weird.flf into the currently executing ascii-art instance'
-            ]
-        ]
-    );
-
-    yargs.help('h').alias('h', 'help')
-        .epilog('[ ©2014 - 2021 : '+actor.style(sig, actor.styles.sigColor)+' ]');
-
-    //let's pipe!
-    if(!process.stdin.isTTY){
-        var BUFSIZE = 65536;
-        let nbytes = 0;
-        let chunks = [];
-        let buffer = '';
-
-        while(true) {
-          try {
-            buffer = Buffer.alloc(BUFSIZE);
-            nbytes = fs.readSync(0, buffer, 0, BUFSIZE, null);
-          }
-          catch (e) {
-            if (e.code != 'EAGAIN') throw e;
-          };
-
-          if (nbytes === 0) break;
-           chunks.push(buffer.slice(0, nbytes));
-        };
-
-        const stdin = Buffer.concat(chunks).toString();
-        if(stdin){
-          process.clPipe = stdin.trim();
-        }
+app.config(function(err, conf, writeConfig){
+    if(conf.autogenerated){
+        delete conf.autogenerated;
+        writeConfig(conf, function(){
+            console.log('CONF WRITTEN')
+        })
     }
+    art.use('artwork', require('ascii-art/artwork'));
+    if(conf.requestlib) art.use('request', require(conf.requestlib));
+    art.font('ascii-art', 'Doom', function(err, value){
+        art.font('Abbey Hawk Sparrow', 'u:script', function(err, sig){
+            app.command({
+                name:'image',
+                description: 'convert an image to ascii',
+                examples: [[
+                    '$0 image foo.jpg ',
+                    'output foo.jpg as inline ascii text'
+                ]],
+                action : function(argv, target, complete){
+                    argv.target = target;
+                    actor.performAction('image', argv, function(){
+                        console.log('DONE');
+                        complete();
+                    });
+                }
+            });
+                app.argument(
+                    'color-distance', 'string',
+                    'algorithm (or combination) for distance between colors', 1,
+                    [
+                        'euclideanDistance',
+                        'classic',
+                        'ratioDistance',
+                        'classicByValue',
+                        'CIE76Difference',
+                        'closestByIntensity',
+                        'rankedChannel',
+                        'simple',
+                        'minDeviation',
+                        'luminosity',
+                        'saturation',
+                        'hue',
+                        'original'
+                    ]
+                );
+                app.argument(
+                    'alphabet', 'string',
+                    'the alphabet to use rendering the image', 1,
+                    [
+                        'variant1',
+                        'variant2',
+                        'variant3',
+                        'variant4',
+                        'ultra-wide',
+                        'wide',
+                        'hatching',
+                        'bits',
+                        'binary',
+                        'greyscale',
+                        'blocks',
+                        'solid'
+                    ]
+                );
+                app.argument(
+                    'bit-depth', 'string',
+                    'bit-depth to use for color', 1,
+                    [4, 8, 32], 'B'
+                );
+                app.argument(
+                    'threshold', 'number',
+                    'the threshold for drawing edges', 1
+                );
+                app.argument(
+                    'floor', 'number',
+                    'the floor of the threshold for drawing edges', 1
+                );
+                app.argument(
+                    'posterize', 'boolean',
+                    'threshold to find edges for lights and darks', 0
+                );
+                app.argument(
+                    'blended', 'boolean',
+                    'merge render modes', 0
+                );
+                app.argument(
+                    'lineart', 'string',
+                    'subpixel lines using block characters', 1
+                );
+                app.argument(
+                    'stipple', 'string',
+                    'subpixel drawing using braille characters', 1
+                );
 
-    argv = yargs.argv;
-    var action = argv._.shift();
-    var target = argv._.shift();
-    var validator = /^[A-Za-z0-9\-\_]+$/;
-    if(action && !validator.test(action)) throw new Error('invalid action');
-    if(argv.v && target && !(new RegExp(argv.v)).test(target)) throw new Error('invalid target');
-    if(target) argv.target = target;
-    //console.log(action, argv, conf, process.clPipe)
-    if(action) actor.performAction(action, argv, function(){
-        console.log('DONE');
+            app.command({
+                name:'text',
+                description: 'add styles and/or font rendering to text',
+                examples: [
+                    [
+                        '$0 text -F Doom "Some Titles"',
+                        '"Some Titles" in the Doom font'
+                    ],[
+                        '$0 text -s red+bold "Some Titles"',
+                        'bolded "Some Titles" in red'
+                    ]
+                ],
+                action : function(argv, target, complete){
+                    argv.target = target;
+                    actor.performAction('text', argv, function(){
+                        console.log('DONE');
+                        complete();
+                    });
+                }
+            });
+                app.argument(
+                    'font', 'string',
+                    'the flf font to render the text in', 1,
+                    null, 'F'
+                );
+                app.argument(
+                    'style', 'string',
+                    'the styles to render the text in', 1
+                );
+                app.argument(
+                    'global', 'string',
+                    'install the font globally', 1
+                );
+
+            app.command({
+                name: 'art',
+                description: 'get some ascii art from various sites',
+                examples: [
+                    [
+                        '$0 art textfiles.com ',
+                        'groupings from "textfiles.com"'
+                    ],[
+                        '$0 art textfiles.com/RAZOR ',
+                        'files in "/RAZOR" on "textfiles.com"'
+                    ],[
+                        '$0 art textfiles.com/art/dragon.txt ',
+                        'request file "dragon.txt" (in the group "art") from "textfiles.com"'
+                    ]
+                ],
+                action : function(argv, target, complete){
+                    argv.target = target;
+                    actor.performAction('art', argv, function(){
+                        console.log('DONE');
+                        complete();
+                    });
+                }
+            });
+            app.command({
+                name: 'font',
+                description: 'work with an .flf( install )',
+                examples: [
+                    [
+                        '$0 font install Font.flf ',
+                        'install a figlet font'
+                    ],[
+                        '$0 font install weird',
+                        'install weird.flf into "/Fonts"'
+                    ],[
+                        '$0 font install weird -g',
+                        'install weird.flf globally'
+                    ]
+                ],
+                action : function(argv, target, complete){
+                    argv.subaction = target;
+                    if(argv._.length){
+                        argv.target = argv._.shift();
+                    }
+                    actor.performAction('install', argv, function(){
+                        complete();
+                    });
+                }
+            });
+            /*
+            //let's pipe!
+            if(!process.stdin.isTTY){
+                var BUFSIZE = 65536;
+                let nbytes = 0;
+                let chunks = [];
+                let buffer = '';
+
+                while(true){
+                  try{
+                    buffer = Buffer.alloc(BUFSIZE);
+                    nbytes = fs.readSync(0, buffer, 0, BUFSIZE, null);
+                  }catch(e){ if(e.code != 'EAGAIN') throw e };
+                  if (nbytes === 0) break;
+                  chunks.push(buffer.slice(0, nbytes));
+                };
+                var stdin = Buffer.concat(chunks).toString();
+                if(stdin){
+                  process.clPipe = stdin.trim();
+                }
+            }
+            */
+            app.useable(function(){ //allow setting of var in config on CL
+                app.plugins({
+                    artwork: { prefix : 'ascii-art-source-' }
+                }, function(err, config, loadPlugins, requirePlusAAInternal){
+                    if(err) return console.log('Error', err);
+                    var sourceList = [];
+                    var failedSources = [];
+                    var sources = {};
+                    //*
+                    conf.artwork.forEach(function(source){
+                        if(conf.artwork.indexOf(source) === -1) sourceList.push(source);
+                        try{
+                            var rtrn = requirePlusAAInternal('ascii-art-source-'+source);
+                            sources[source] = rtrn;
+                            art.Artwork.addSource(rtrn);
+                            sources[source] = rtrn;
+                            sourceList.push(source);
+                        }catch(ex){
+                            failedSources.push(source);
+                        }
+                    });
+                    loadPlugins('*', function(err, plugins, pluginObjects){
+                        var pluginStatus;
+                        var pluginNames;
+                        if(err){
+                            pluginStatus = 'No plugins found.';
+                            pluginNames = [];
+                        }else{
+                            //TODO: look for missing plugins in plugins
+                            pluginStatus = (
+                                sourceList.length?
+                                sourceList.join(', '):
+                                'N/A'
+                            );
+                            pluginNames = Object.keys(plugins.artwork);
+                        }
+                        if(failedSources.length){
+                            pluginStatus += "\n\nPlugins(failed): \n    "+failedSources.join(', ')
+                        }
+                        //app.defaultPluginDir();
+                        app.help();
+                        app.header(
+                            actor.style(value, 'yellow')
+                                .slice(0,-5)+'\033[39m  v'+artpkg.version+"\n"+
+                                '                                              '
+                                +'tools v'+pkg.version+"\n"+
+                            'Plugins:'+"\n"+'    '+pluginStatus+"\n"
+                        );
+                        app.footer();
+                        app.run(function(ex){
+                            console.log(ex);
+                        });
+                    });
+                });
+            });
+        });
     });
-});
-});
+}, true);
